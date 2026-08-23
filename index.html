@@ -1,0 +1,436 @@
+<meta charset="utf-8">
+<title>三帳戶實況</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="三個美股 paper 帳戶自 2026-07-01 起、各以 10 萬美元本金的每日淨值與持股。">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https://hits.sh; base-uri 'none'; form-action 'none'">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef0f3; --surface:#ffffff; --surface-2:#f5f6f8; --ink:#161b22; --ink-2:#4f5866; --ink-3:#8591a0;
+  --line:#dfe3e9; --line-2:#eceff3; --accent:#0b6e6a; --accent-soft:#d9efec; --accent-ink:#ffffff;
+  --up:#c4392d; --up-soft:#fbe7e4; --down:#1e8a4e; --down-soft:#e1f3e8; --chip:#e7ebf0; --shadow:0 1px 2px rgba(20,27,40,.06),0 8px 24px -12px rgba(20,27,40,.18);
+  --c-main:#2a78d6; --c-attack:#e2602a; --c-shaqi:#0b7f79; --c-etf:#8a94a3; --grid:#e6e9ee; --axis:#c3c9d2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e1116; --surface:#161a21; --surface-2:#1c2129; --ink:#edf0f4; --ink-2:#aeb6c2; --ink-3:#6f7987;
+    --line:#2a313c; --line-2:#222833; --accent:#3fbfb3; --accent-soft:#153431; --accent-ink:#07100f;
+    --up:#f07063; --up-soft:#3a1f1c; --down:#45c181; --down-soft:#163124; --chip:#232a34; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+    --c-main:#5b9df0; --c-attack:#f0834f; --c-shaqi:#35b8ad; --c-etf:#8f99a8; --grid:#232933; --axis:#39414d;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1116; --surface:#161a21; --surface-2:#1c2129; --ink:#edf0f4; --ink-2:#aeb6c2; --ink-3:#6f7987;
+  --line:#2a313c; --line-2:#222833; --accent:#3fbfb3; --accent-soft:#153431; --accent-ink:#07100f;
+  --up:#f07063; --up-soft:#3a1f1c; --down:#45c181; --down-soft:#163124; --chip:#232a34; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  --c-main:#5b9df0; --c-attack:#f0834f; --c-shaqi:#35b8ad; --c-etf:#8f99a8; --grid:#232933; --axis:#39414d;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope","Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif;font-size:15px;line-height:1.55;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+/* top bar */
+.top{position:relative;z-index:5;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:58px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em;font-size:17px}
+.mark{width:26px;height:26px;border-radius:7px;background:var(--accent);position:relative;flex:none}
+.mark::before,.mark::after{content:"";position:absolute;left:6px;right:6px;height:3px;border-radius:2px;background:var(--accent-ink)}
+.mark::before{top:8px;width:8px}.mark::after{top:15px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;background:var(--chip);color:var(--ink-2)}
+.pill.paper{background:var(--accent-soft);color:var(--accent)}
+.spacer{flex:1}
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink-2)}
+.meta .pill b{color:var(--ink);font-weight:700}
+.hidden{display:none !important}
+.pill.hits{padding:0;background:transparent;overflow:hidden;border-radius:6px}
+.pill.hits img{display:block;height:20px;width:auto}
+@media (min-width:700px){.top{position:sticky;top:0}}
+/* hero */
+.hero{padding:34px 0 10px;display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:end}
+@media (max-width:820px){.hero{grid-template-columns:1fr;gap:18px}}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.hero h1{margin:6px 0 2px;font-size:clamp(36px,6vw,58px);line-height:1.02;letter-spacing:-.02em;font-weight:800}
+.hero h1 small{font-size:.42em;font-weight:700;color:var(--ink-3);letter-spacing:0;margin-left:6px}
+.delta{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-weight:700;margin-top:6px}
+.delta .big{font-size:20px}
+.delta .sub{font-size:13px;color:var(--ink-2);font-weight:500}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--ink-2)}
+.caption{font-size:13px;color:var(--ink-2);margin-top:10px;max-width:60ch;text-wrap:pretty}
+/* mode control */
+.modes{display:flex;flex-direction:column;gap:8px;justify-self:end;width:100%;max-width:440px}
+@media (max-width:820px){.modes{justify-self:start}}
+.modes .label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--chip);border-radius:12px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:9px 6px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--ink-2);transition:background .15s,color .15s,box-shadow .15s;line-height:1.2}
+.seg button span{display:block;font-size:11px;font-weight:600;color:var(--ink-3);margin-top:2px;letter-spacing:.02em}
+.seg button[aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg button[aria-checked="true"] span{color:var(--accent)}
+.modes .note{font-size:12px;color:var(--ink-3);line-height:1.5}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+@media (max-width:900px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.card .head{display:flex;align-items:center;gap:9px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.card .name{font-weight:800;font-size:16px}
+.card .tag{font-size:12px;color:var(--ink-3);font-weight:600;margin-left:2px}
+.card .nav{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.card .nav small{font-size:13px;color:var(--ink-3);font-weight:600;letter-spacing:0;margin-left:4px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.kv div{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.kv .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.kv .v{font-weight:700;font-size:14.5px;margin-top:2px}
+.kv .v small{display:block;font-weight:500;color:var(--ink-2);font-size:12px;margin-top:1px}
+.spark{width:100%;height:54px;display:block}
+.holds{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+.holds .hrow{display:grid;grid-template-columns:64px 1fr 56px;gap:10px;align-items:center;font-size:13.5px}
+.holds .tk{font-weight:800;letter-spacing:.02em}
+.holds .tk.etf{color:var(--ink-2)}
+.holds .tk.cash{color:var(--ink-3);font-weight:700}
+.bar{height:8px;background:var(--line-2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;min-width:2px}
+.holds .w{text-align:right;font-weight:700;color:var(--ink-2)}
+.holds .sum{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);border-top:1px dashed var(--line);padding-top:7px;margin-top:2px}
+/* chart */
+.section{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px}
+.section .sh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.section h2{margin:0;font-size:16px;font-weight:800}
+.section .sh .hint{font-size:12.5px;color:var(--ink-3)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);margin-left:auto}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.chartbox{position:relative;margin-top:10px}
+.chartbox svg{display:block;width:100%;height:auto}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px 10px;font-size:12.5px;min-width:150px;transform:translate(-50%,0);opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.tip .d{font-weight:700;color:var(--ink);margin-bottom:4px}
+.tip .r{display:flex;justify-content:space-between;gap:14px;color:var(--ink-2)}
+.tip .r b{color:var(--ink);font-weight:700}
+.tip .r i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+@media (prefers-reduced-motion: reduce){.tip,.seg button{transition:none}}
+details{margin-top:12px}
+summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent);list-style:none;display:inline-flex;align-items:center;gap:6px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+.tablewrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}
+th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700;background:var(--surface-2);position:sticky;top:0}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+td.chg{font-weight:600}
+/* footer */
+footer{margin:34px 0 40px;color:var(--ink-3);font-size:12.5px;line-height:1.7}
+footer .row{display:flex;gap:8px 18px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:16px}
+footer .row .spacer{flex:1}
+.note-list{margin:10px 0 0;padding-left:18px;max-width:80ch}
+.note-list li{margin:2px 0}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><span>三帳戶實況</span><span class="pill paper">PAPER・模擬</span></div>
+    <div class="spacer"></div>
+    <div class="meta">
+      <span class="pill" id="chip-date">資料日 <b>—</b></span>
+      <span class="pill" id="chip-updated">更新 <b>—</b></span>
+      <span class="pill hidden" id="chip-visits">瀏覽 <b>—</b> 人次</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">三帳戶合計・每戶本金 $100,000・自 <span id="start-date">—</span> 起</div>
+      <h1><span id="total">—</span><small>USD</small></h1>
+      <div class="delta" id="total-delta"></div>
+      <p class="caption" id="hero-caption"></p>
+    </div>
+    <div class="modes">
+      <div class="label">顯示組合</div>
+      <div class="seg" role="radiogroup" aria-label="顯示組合" id="seg">
+        <button type="button" role="radio" aria-checked="true" data-mode="pure">純策略<span>100% 策略</span></button>
+        <button type="button" role="radio" aria-checked="false" data-mode="tqqq">＋TQQQ<span>80% 策略＋20% TQQQ</span></button>
+        <button type="button" role="radio" aria-checked="false" data-mode="soxl">＋SOXL<span>80% 策略＋20% SOXL</span></button>
+      </div>
+      <div class="note" id="mode-note"></div>
+    </div>
+  </section>
+
+  <section class="cards" id="cards" aria-live="polite"></section>
+
+  <section class="section">
+    <div class="sh">
+      <h2>每日淨值</h2>
+      <span class="hint" id="chart-hint"></span>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="chartbox" id="chartbox">
+      <svg id="chart" role="img" aria-labelledby="chart-title"><title id="chart-title">三帳戶每日淨值折線圖</title></svg>
+      <div class="tip" id="tip"></div>
+    </div>
+    <details>
+      <summary>以表格檢視每日淨值</summary>
+      <div class="tablewrap"><table id="navtable"></table></div>
+    </details>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <span>本站為 <b>paper（模擬）</b>紀錄，非投資建議，亦不揭露選股與進出方法。</span>
+    <span class="spacer"></span>
+    <span id="foot-updated"></span>
+    <span id="foot-visits" class="hidden"></span>
+  </div>
+  <ul class="note-list">
+    <li>每個帳戶自 <span class="start-date">—</span> 起以 100,000 美元本金 paper 操作；淨值以 <span id="base-date">—</span> 收盤為基準，逐日依各帳戶紙上權益變化計算（含交易成本）。</li>
+    <li>「＋TQQQ／＋SOXL」＝ 7/1 起以 80% 資金走策略、20% 買進該 ETF 並持有到現在，不再平衡；持股比例為兩部分合併後的占比。</li>
+    <li>資料日為最近一個已收盤的美股交易日；每個交易日收盤後更新一次。紅色為上漲、綠色為下跌。</li>
+  </ul>
+</footer>
+
+<script id="d" type="application/json">{"site":{"name":"三帳戶實況","start":"2026-07-01","base":"2026-06-30","capital":100000.0,"dataDate":"2026-08-21","updatedAt":"2026-08-24 01:53","tz":"台北","etfAsOf":{"TQQQ":"2026-08-21","SOXL":"2026-08-21"},"visits":null,"publicHost":null},"dates":["2026-06-30","2026-07-01","2026-07-02","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21"],"accounts":[{"id":"main","name":"主帳戶","tag":"求穩定","color":"#2a78d6","index":[1.0,0.926917,0.868006,0.893895,0.880045,0.902706,0.914266,0.912434,0.920339,0.943851,0.918773,0.916785,0.92441,0.922076,0.939607,0.92562,0.922309,0.914035,0.887667,0.841284,0.814022,0.888002,0.893241,0.902771,0.887904,0.872384,0.871307,0.885573,0.837231,0.8418,0.8962,0.898447,0.910463,0.950992,0.865647,0.82547,0.8392,0.828424],"holdings":[{"t":"MU","w":18.44},{"t":"SNDK","w":17.89},{"t":"LITE","w":16.35},{"t":"INTC","w":16.1},{"t":"TSEM","w":15.51},{"t":"AXTI","w":12.72}],"cash":2.99},{"id":"attack","name":"攻擊帳戶","tag":"求爆擊","color":"#e2602a","index":[1.0,0.910643,0.834932,0.857138,0.846599,0.888565,0.897782,0.897596,0.933915,0.952282,0.929245,0.94486,0.966873,0.976177,0.990594,0.988523,0.98323,0.975255,0.968175,0.950697,0.966047,0.990018,0.996212,0.971371,0.976691,0.949346,0.959063,0.950216,0.939249,0.964745,1.011518,1.038617,1.067021,1.12377,1.017383,0.963719,0.985277,0.977094],"holdings":[{"t":"STX","w":31.15},{"t":"MU","w":30.54},{"t":"SNDK","w":22.68},{"t":"AXTI","w":15.63}],"cash":0.0},{"id":"shaqi","name":"煞氣帳戶","tag":"給Q狗錢","color":"#0b7f79","index":[1.0,0.912903,0.823283,0.852027,0.794295,0.823273,0.868364,0.876314,0.814624,0.840936,0.773843,0.70289,0.702719,0.718012,0.807193,0.812443,0.821365,0.757804,0.717865,0.651513,0.622554,0.733686,0.720357,0.719635,0.765363,0.737732,0.688355,0.669039,0.665883,0.670581,0.704101,0.731788,0.767714,0.794282,0.728805,0.701568,0.712889,0.70966],"holdings":[{"t":"MU","w":30.92},{"t":"TSEM","w":29.34},{"t":"SNDK","w":27.55},{"t":"STX","w":9.17},{"t":"AMD","w":3.03}],"cash":0.0}],"etfs":{"TQQQ":[1.0,0.956296,0.905556,0.943457,0.891728,0.897778,0.942469,0.950988,0.89679,0.926173,0.919012,0.873333,0.833704,0.835185,0.881111,0.867654,0.818519,0.790123,0.782716,0.76,0.712963,0.781481,0.797778,0.839012,0.923704,0.899259,0.889259,0.919383,0.911111,0.901975,0.920988,0.952469,0.948025,0.94321,0.895432,0.88963,0.870123,0.878642],"SOXL":[1.0,0.81568,0.680402,0.729819,0.619699,0.655469,0.72157,0.720858,0.620037,0.662367,0.620712,0.534213,0.50793,0.512954,0.594428,0.603614,0.590529,0.512954,0.480484,0.410708,0.344906,0.43013,0.43013,0.437591,0.52454,0.495182,0.496157,0.525852,0.487421,0.498669,0.533013,0.545011,0.543474,0.568145,0.484046,0.452701,0.458213,0.452177]}}</script>
+<script>
+(function(){
+  "use strict";
+  var D = JSON.parse(document.getElementById("d").textContent);
+  var C = D.site.capital;
+  var MODES = {pure:{etf:null, label:"純策略"}, tqqq:{etf:"TQQQ", label:"80% 策略＋20% TQQQ"}, soxl:{etf:"SOXL", label:"80% 策略＋20% SOXL"}};
+  var mode = "pure";
+  var n = D.dates.length, last = n - 1;
+
+  function $(id){ return document.getElementById(id); }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function clear(e){ while (e.firstChild) e.removeChild(e.firstChild); }
+  function usd(v, frac){ return "$" + v.toLocaleString("en-US", {minimumFractionDigits: frac == null ? 0 : frac, maximumFractionDigits: frac == null ? 0 : frac}); }
+  function sgn(v){ return v > 0 ? "+" : (v < 0 ? "−" : ""); }
+  function pct(v, d){ return sgn(v) + Math.abs(v * 100).toFixed(d == null ? 2 : d) + "%"; }
+  function money(v){ return sgn(v) + usd(Math.abs(v)); }
+  function cls(v){ return v > 0.00005 ? "up" : (v < -0.00005 ? "down" : "flat"); }
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function color(acc){ return css("--c-" + acc.id) || acc.color; }
+  function mdy(s){ return s.slice(5).replace("-", "/"); }
+
+  function parts(acc, i, m){
+    var e = MODES[m].etf;
+    if (!e) return {s: C * acc.index[i], e: 0};
+    return {s: 0.8 * C * acc.index[i], e: 0.2 * C * D.etfs[e][i]};
+  }
+  function nav(acc, i, m){ var p = parts(acc, i, m); return p.s + p.e; }
+  function series(acc, m){ var out = []; for (var i = 0; i < n; i++) out.push(nav(acc, i, m)); return out; }
+
+  // ---- header chips
+  $("chip-date").lastChild.textContent = D.site.dataDate;
+  $("chip-updated").lastChild.textContent = D.site.updatedAt + "（" + D.site.tz + "）";
+  $("start-date").textContent = D.site.start;
+  $("base-date").textContent = D.site.base;
+  Array.prototype.forEach.call(document.querySelectorAll(".start-date"), function(s){ s.textContent = D.site.start; });
+  $("foot-updated").textContent = "最後更新 " + D.site.updatedAt + "（" + D.site.tz + "）・資料日 " + D.site.dataDate;
+
+  // ---- hero
+  function renderHero(){
+    var tot = 0, prev = 0;
+    D.accounts.forEach(function(a){ tot += nav(a, last, mode); prev += nav(a, last - 1, mode); });
+    var base = C * D.accounts.length;
+    $("total").textContent = usd(tot);
+    var d = $("total-delta"); clear(d);
+    var r = tot / base - 1, dd = tot / prev - 1;
+    var b = el("span", "big " + cls(r), money(tot - base) + "（" + pct(r, 1) + "）");
+    d.appendChild(b);
+    d.appendChild(el("span", "sub", "自起始日；最近交易日 " + mdy(D.dates[last]) + " " ));
+    d.appendChild(el("span", "sub " + cls(dd), pct(dd) + "（" + money(tot - prev) + "）"));
+    $("hero-caption").textContent = mode === "pure"
+      ? "三個帳戶各自獨立，每戶 $100,000 起，合計本金 " + usd(base) + "。數字為紙上權益，已含交易成本。"
+      : "目前顯示「" + MODES[mode].label + "」：每戶 $80,000 走策略、$20,000 於起始日買進 " + MODES[mode].etf + " 持有至今。合計本金 " + usd(base) + "。";
+    $("mode-note").textContent = mode === "pure"
+      ? "切換可檢視同一段期間內，若有 20% 資金放在槓桿 ETF 的結果。"
+      : MODES[mode].etf + " 自 " + D.site.base + " 收盤起的相對變化 " + pct(D.etfs[MODES[mode].etf][last] - 1, 1) + "；ETF 價格截至 " + (D.site.etfAsOf[MODES[mode].etf] || "—") + "。";
+  }
+
+  // ---- cards
+  function sparkline(vals, stroke){
+    var w = 300, h = 54, pad = 3;
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals); if (mx === mn) mx = mn + 1;
+    var x = function(i){ return pad + (w - 2 * pad) * i / (vals.length - 1); };
+    var y = function(v){ return pad + (h - 2 * pad) * (1 - (v - mn) / (mx - mn)); };
+    var d = ""; vals.forEach(function(v, i){ d += (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); });
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 " + w + " " + h); svg.setAttribute("class", "spark"); svg.setAttribute("aria-hidden", "true");
+    var area = document.createElementNS(ns, "path"); area.setAttribute("d", d + "L" + x(vals.length - 1).toFixed(1) + " " + h + "L" + x(0) + " " + h + "Z"); area.setAttribute("fill", stroke); area.setAttribute("opacity", "0.10");
+    var base = document.createElementNS(ns, "line"); var yb = y(vals[0]); base.setAttribute("x1", 0); base.setAttribute("x2", w); base.setAttribute("y1", yb); base.setAttribute("y2", yb); base.setAttribute("stroke", css("--axis")); base.setAttribute("stroke-dasharray", "3 3");
+    var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); p.setAttribute("fill", "none"); p.setAttribute("stroke", stroke); p.setAttribute("stroke-width", "2"); p.setAttribute("stroke-linejoin", "round"); p.setAttribute("stroke-linecap", "round");
+    var c = document.createElementNS(ns, "circle"); c.setAttribute("cx", x(vals.length - 1)); c.setAttribute("cy", y(vals[vals.length - 1])); c.setAttribute("r", "3.5"); c.setAttribute("fill", stroke); c.setAttribute("stroke", css("--surface")); c.setAttribute("stroke-width", "2");
+    svg.appendChild(area); svg.appendChild(base); svg.appendChild(p); svg.appendChild(c);
+    return svg;
+  }
+  function renderCards(){
+    var box = $("cards"); clear(box);
+    D.accounts.forEach(function(a){
+      var col = color(a), s = series(a, mode), v = s[last], r = v / C - 1, dd = v / s[last - 1] - 1;
+      var p = parts(a, last, mode), tot = p.s + p.e;
+      var card = el("article", "card"); card.setAttribute("aria-label", a.name);
+      var head = el("div", "head"); var dot = el("span", "dot"); dot.style.background = col; head.appendChild(dot);
+      head.appendChild(el("span", "name", a.name)); head.appendChild(el("span", "tag", a.tag)); card.appendChild(head);
+      var navEl = el("div", "nav", usd(v)); navEl.appendChild(el("small", null, "USD")); card.appendChild(navEl);
+      var kv = el("div", "kv");
+      var k1 = el("div"); k1.appendChild(el("div", "k", "自起始日")); var v1 = el("div", "v " + cls(r), pct(r, 1)); v1.appendChild(el("small", null, money(v - C))); k1.appendChild(v1);
+      var k2 = el("div"); k2.appendChild(el("div", "k", "最近交易日 " + mdy(D.dates[last]))); var v2 = el("div", "v " + cls(dd), pct(dd)); v2.appendChild(el("small", null, money(v - s[last - 1]))); k2.appendChild(v2);
+      kv.appendChild(k1); kv.appendChild(k2); card.appendChild(kv);
+      card.appendChild(sparkline(s, col));
+      var holds = el("div", "holds");
+      var rows = a.holdings.map(function(h){ return {t: h.t, w: h.w / 100 * p.s / tot * 100, kind: "stk"}; });
+      if (p.e > 0) rows.push({t: MODES[mode].etf, w: p.e / tot * 100, kind: "etf"});
+      rows.sort(function(x, y){ return y.w - x.w; });
+      var cash = a.cash / 100 * p.s / tot * 100; if (cash >= 0.05) rows.push({t: "現金", w: cash, kind: "cash"});
+      var top = Math.max.apply(null, rows.map(function(x){ return x.w; }));
+      rows.forEach(function(h){
+        var rw = el("div", "hrow"); rw.appendChild(el("span", "tk " + h.kind, h.t));
+        var bar = el("div", "bar"); var fill = el("i"); fill.style.width = Math.max(1.5, h.w / top * 100).toFixed(1) + "%";
+        fill.style.background = h.kind === "stk" ? col : (h.kind === "etf" ? css("--c-etf") : css("--axis")); bar.appendChild(fill); rw.appendChild(bar);
+        rw.appendChild(el("span", "w", h.w.toFixed(1) + "%")); holds.appendChild(rw);
+      });
+      var sum = el("div", "sum"); sum.appendChild(el("span", null, "持股 " + a.holdings.length + " 檔" + (p.e > 0 ? "＋" + MODES[mode].etf : ""))); sum.appendChild(el("span", null, "市值 " + usd(tot)));
+      holds.appendChild(sum); card.appendChild(holds);
+      box.appendChild(card);
+    });
+  }
+
+  // ---- line chart
+  var chart = $("chart"), box = $("chartbox"), tip = $("tip");
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(tag, attrs){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function renderChart(){
+    var W = Math.max(320, box.clientWidth || 900), H = W < 560 ? 260 : 340;
+    var narrow = W < 620, L = 52, R = narrow ? 62 : 128, T = 18, B = 34, pw = W - L - R, ph = H - T - B;
+    var all = D.accounts.map(function(a){ return {a: a, s: series(a, mode), col: color(a)}; });
+    var mn = Infinity, mx = -Infinity; all.forEach(function(o){ o.s.forEach(function(v){ if (v < mn) mn = v; if (v > mx) mx = v; }); });
+    mn = Math.min(mn, C); mx = Math.max(mx, C); var pad = (mx - mn) * 0.08 || 1000; mn -= pad; mx += pad;
+    var x = function(i){ return L + pw * i / last; }, y = function(v){ return T + ph * (1 - (v - mn) / (mx - mn)); };
+    while (chart.firstChild && chart.firstChild.tagName !== "title") chart.removeChild(chart.firstChild);
+    while (chart.childNodes.length > 1) chart.removeChild(chart.lastChild);
+    chart.setAttribute("viewBox", "0 0 " + W + " " + H); chart.setAttribute("height", H);
+    // grid + y labels
+    var step = niceStep((mx - mn) / 6), t0 = Math.ceil(mn / step) * step;
+    for (var t = t0; t <= mx; t += step){
+      var yy = y(t), isBase = Math.abs(t - C) < 1e-6;
+      chart.appendChild(mk("line", {x1: L, x2: L + pw, y1: yy, y2: yy, stroke: css(isBase ? "--axis" : "--grid"), "stroke-width": 1}));
+      var lab = mk("text", {x: L - 8, y: yy + 4, "text-anchor": "end", "font-size": 11, fill: css("--ink-3"), "font-weight": 600}); lab.textContent = "$" + Math.round(t / 1000) + "k"; chart.appendChild(lab);
+    }
+    // x labels (~6)
+    var every = Math.max(1, Math.round(last / 6));
+    for (var i = 0; i <= last; i += every){
+      var lx = mk("text", {x: x(i), y: H - 12, "text-anchor": i === 0 ? "start" : (i >= last - every / 2 ? "end" : "middle"), "font-size": 11, fill: css("--ink-3"), "font-weight": 600}); lx.textContent = mdy(D.dates[i]); chart.appendChild(lx);
+    }
+    // lines
+    all.forEach(function(o){
+      var d = ""; o.s.forEach(function(v, i){ d += (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); });
+      chart.appendChild(mk("path", {d: d, fill: "none", stroke: o.col, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round"}));
+      chart.appendChild(mk("circle", {cx: x(last), cy: y(o.s[last]), r: 4, fill: o.col, stroke: css("--surface"), "stroke-width": 2}));
+    });
+    // end labels, de-collided
+    var ends = all.map(function(o){ return {o: o, y: y(o.s[last])}; }).sort(function(p, q){ return p.y - q.y; });
+    for (var k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < 14) ends[k].y = ends[k - 1].y + 14;
+    ends.forEach(function(e){
+      var tl = mk("text", {x: L + pw + 8, y: e.y + 4, "font-size": 11.5, "font-weight": 700, fill: css("--ink-2")}); tl.textContent = (narrow ? "" : e.o.a.name + " ") + usd(e.o.s[last]); chart.appendChild(tl);
+    });
+    // hover layer
+    var cross = mk("line", {x1: 0, x2: 0, y1: T, y2: T + ph, stroke: css("--axis"), "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0}); chart.appendChild(cross);
+    var dots = all.map(function(o){ var c = mk("circle", {r: 4.5, fill: o.col, stroke: css("--surface"), "stroke-width": 2, opacity: 0}); chart.appendChild(c); return c; });
+    var hit = mk("rect", {x: L, y: T, width: pw, height: ph, fill: "transparent"}); chart.appendChild(hit);
+    function show(i){
+      cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
+      dots.forEach(function(c, k){ c.setAttribute("cx", x(i)); c.setAttribute("cy", y(all[k].s[i])); c.setAttribute("opacity", 1); });
+      clear(tip); tip.appendChild(el("div", "d", D.dates[i] + (i === 0 ? "（基準日）" : "")));
+      all.forEach(function(o){ var r = el("div", "r"); var l = el("span"); var ic = el("i"); ic.style.background = o.col; l.appendChild(ic); l.appendChild(document.createTextNode(o.a.name)); r.appendChild(l);
+        var ch = i ? o.s[i] / o.s[i - 1] - 1 : 0; var b = el("b", null, usd(o.s[i])); r.appendChild(b); tip.appendChild(r);
+        if (i){ var r2 = el("div", "r"); r2.appendChild(el("span", null, "")); r2.appendChild(el("span", cls(ch), pct(ch))); tip.appendChild(r2); } });
+      var scale = box.clientWidth / W; var px = x(i) * scale; var tipW = tip.offsetWidth || 170;
+      var left = Math.min(Math.max(px, tipW / 2 + 4), box.clientWidth - tipW / 2 - 4);
+      tip.style.left = left + "px"; tip.style.top = (T * scale + 6) + "px"; tip.classList.add("on");
+    }
+    function hide(){ cross.setAttribute("opacity", 0); dots.forEach(function(c){ c.setAttribute("opacity", 0); }); tip.classList.remove("on"); }
+    hit.addEventListener("pointermove", function(ev){ var rect = chart.getBoundingClientRect(); var fx = (ev.clientX - rect.left) / rect.width * W; var i = Math.round((fx - L) / pw * last); i = Math.max(0, Math.min(last, i)); show(i); });
+    hit.addEventListener("pointerleave", hide);
+    $("chart-hint").textContent = D.site.base + " 收盤為 $100,000 基準・至 " + D.site.dataDate + "（" + last + " 個交易日）";
+    var lg = $("legend"); clear(lg); all.forEach(function(o){ var s = el("span"); var i = el("i"); i.style.background = o.col; s.appendChild(i); s.appendChild(document.createTextNode(o.a.name)); lg.appendChild(s); });
+  }
+  function niceStep(raw){ var p = Math.pow(10, Math.floor(Math.log10(raw))); var f = raw / p; var s = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10; return s * p; }
+
+  // ---- table
+  function renderTable(){
+    var tb = $("navtable"); clear(tb);
+    var thead = el("thead"), tr = el("tr"); tr.appendChild(el("th", null, "日期"));
+    D.accounts.forEach(function(a){ tr.appendChild(el("th", null, a.name)); tr.appendChild(el("th", null, "日變動")); }); tr.appendChild(el("th", null, "合計")); thead.appendChild(tr); tb.appendChild(thead);
+    var body = el("tbody"), S = D.accounts.map(function(a){ return series(a, mode); });
+    for (var i = last; i >= 0; i--){
+      var r = el("tr"); r.appendChild(el("td", null, D.dates[i] + (i === 0 ? "（基準）" : ""))); var tot = 0;
+      S.forEach(function(s){ tot += s[i]; r.appendChild(el("td", null, usd(s[i]))); var ch = i ? s[i] / s[i - 1] - 1 : 0; r.appendChild(el("td", "chg " + (i ? cls(ch) : "flat"), i ? pct(ch) : "—")); });
+      r.appendChild(el("td", null, usd(tot))); body.appendChild(r);
+    }
+    tb.appendChild(body);
+  }
+
+  function renderAll(){ renderHero(); renderCards(); renderChart(); renderTable(); }
+
+  // ---- mode control
+  var seg = $("seg");
+  Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){
+    b.addEventListener("click", function(){ setMode(b.getAttribute("data-mode")); });
+    b.addEventListener("keydown", function(ev){ var order = ["pure", "tqqq", "soxl"], i = order.indexOf(mode);
+      if (ev.key === "ArrowRight" || ev.key === "ArrowDown"){ setMode(order[(i + 1) % 3]); ev.preventDefault(); }
+      if (ev.key === "ArrowLeft" || ev.key === "ArrowUp"){ setMode(order[(i + 2) % 3]); ev.preventDefault(); } });
+  });
+  function setMode(m){ if (!MODES[m] || (m !== "pure" && !D.etfs[MODES[m].etf])) return; mode = m;
+    Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){ var on = b.getAttribute("data-mode") === m; b.setAttribute("aria-checked", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; if (on) b.focus({preventScroll: true}); });
+    renderAll(); }
+
+  // ---- visitor counter
+  //   公開主機（GitHub Pages 或 site.publicHost）：hits.sh 徽章（免後端，以網址為 key，每次載入計 1 次）
+  //   自架（serve.py）：POST api/visit；其他（Artifact 等靜態沙盒）：顯示產生時嵌入的數字，沒有就隱藏
+  function showVisits(count, asOf){
+    var chip = $("chip-visits"); chip.classList.remove("hidden"); chip.lastChild.previousSibling.textContent = String(count);
+    var f = $("foot-visits"); f.classList.remove("hidden"); f.textContent = "瀏覽 " + count.toLocaleString("en-US") + " 人次" + (asOf ? "（統計至 " + asOf + "）" : "");
+  }
+  function hitsBadge(){
+    var host = location.hostname, path = location.pathname.replace(/index\.html$/, "");
+    var dark = (document.documentElement.getAttribute("data-theme") === "dark") || (document.documentElement.getAttribute("data-theme") !== "light" && mq.matches);
+    var src = "https://hits.sh/" + host + path + ".svg?style=flat-square&label=" + encodeURIComponent("瀏覽") + "&color=" + (dark ? "3fbfb3" : "0b6e6a") + "&labelColor=" + (dark ? "232a34" : "4f5866");
+    var chip = $("chip-visits"); clear(chip); chip.classList.add("hits"); chip.classList.remove("hidden");
+    var img = el("img"); img.alt = "瀏覽次數"; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = src;
+    img.addEventListener("error", function(){ chip.classList.add("hidden"); });
+    chip.appendChild(img);
+    var f = $("foot-visits"); f.classList.remove("hidden"); f.textContent = "瀏覽次數由 hits.sh 統計（每次載入計 1 次）";
+  }
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  (function(){
+    var isPublic = /\.github\.io$/i.test(location.hostname) || (D.site.publicHost && location.hostname === D.site.publicHost);
+    if (isPublic) { hitsBadge(); return; }
+    var done = false;
+    try {
+      fetch("api/visit", {method: "POST", cache: "no-store", credentials: "same-origin"}).then(function(r){ if (!r.ok) throw new Error("no counter"); return r.json(); })
+        .then(function(j){ if (typeof j.count === "number"){ done = true; showVisits(j.count); } })
+        .catch(function(){ if (!done && typeof D.site.visits === "number") showVisits(D.site.visits, D.site.updatedAt); });
+    } catch (e) { if (typeof D.site.visits === "number") showVisits(D.site.visits, D.site.updatedAt); }
+  })();
+
+  // ---- theme / resize reactions
+  if (mq.addEventListener) mq.addEventListener("change", renderAll);
+  new MutationObserver(renderAll).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+  var rto; window.addEventListener("resize", function(){ clearTimeout(rto); rto = setTimeout(renderChart, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderChart);
+
+  renderAll();
+})();
+</script>
